@@ -33,12 +33,15 @@ RUN mkdir -p /var/www && \
     tdiary new ./ --skip-bundle
 RUN echo "gem 'unicorn'" >> /var/www/Gemfile.local && \
     echo "gem 'tdiary-style-gfm'" >> /var/www/Gemfile.local && \
-    echo "gem 'tdiary-contrib'" >> /var/www/Gemfile.local && \
-    echo "gem 'tdiary-cache-redis'" >> /var/www/Gemfile.local
+    echo "gem 'tdiary-contrib'" >> /var/www/Gemfile.local
+# RUN echo "gem 'tdiary-cache-redis'" >> /var/www/Gemfile.local
 RUN cd /var/www/ && bundle install --without test development
 RUN sed -i "s/@style = 'Wiki'/@style = 'GFM'/" /var/www/tdiary.conf
 COPY unicorn.conf /var/www/
 RUN htpasswd -dbc /var/www/.htpasswd tdiaryman tdiaryman
+RUN curl -o theme.tar.gz http://www.tdiary.org/download/tdiary-theme-v4.1.1.tar.gz && \
+    tar -zxvf theme.tar.gz && \
+    mv tdiary-theme-v4.1.1/* /var/www/theme/
 RUN mkdir -p /var/www/log
 RUN mkdir -p /var/www/data
 COPY my_plugins/* /var/www/misc/plugin/
